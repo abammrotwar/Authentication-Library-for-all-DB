@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.Odbc;
 using System.Data.OleDb;
+using MySql.Data.MySqlClient;
 
 
 namespace Authentication_Library_for_all_DB
@@ -33,6 +34,7 @@ namespace Authentication_Library_for_all_DB
                         retunobject = ds._MSSQLServerConnection(ConnectionString, query);
                         break;
                     case 2:
+                        retunobject = ds._MySQLConnection(ConnectionString, query);
                         break;
                     case 3:
                         break;
@@ -81,6 +83,39 @@ namespace Authentication_Library_for_all_DB
                 }
             }
 
+
+        }
+
+        /// <summary>
+        /// Get data from MySQL
+        /// </summary>
+        /// <param name="ConnectionString">Connection String</param>
+        /// <param name="query">Query to run</param>
+        /// <returns>Return type object according to ReturnValue</returns>
+        private object _MySQLConnection(string ConnectionString, string query)
+        {
+            Object data = new object();
+            MySqlConnection con = new MySqlConnection(ConnectionString);
+            MySqlCommand cmd = new MySqlCommand(query, con);
+            try
+            {
+                con.Open();
+                data = cmd.ExecuteScalar();
+                con.Close();
+                return data;
+            }
+            catch (Exception ex)
+            {
+
+                throw new ApplicationException(ex.Message);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
 
         }
     }
