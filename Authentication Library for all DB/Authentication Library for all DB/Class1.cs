@@ -20,7 +20,7 @@ namespace Authentication_Library_for_all_DB
         /// <param name="query">query</param>
         /// <param name="ReturnValue">1 for the entire row, 2 for only id. By default it will pass 2</param>
         /// <param name="DBValue">For SQL Server pass 1, For MySQL pass 2, For Oracle Pass 3, By default we assume that you are using SQL Server </param>
-        public static Object DatabaseCredentials(string DBName, string ConnectionString,string query, int ReturnValue = 2, int DBValue = 1)
+        public static Object DatabaseCredentials(string DBName, string ConnectionString, string query, int ReturnValue = 2, int DBValue = 1)
         {
             Authentication_Library_for_all_DB.DatabaseCredentials ds = new Authentication_Library_for_all_DB.DatabaseCredentials();
             object retunobject = "Dummy value";
@@ -30,7 +30,7 @@ namespace Authentication_Library_for_all_DB
                 switch (DBValue)
                 {
                     case 1:
-                        retunobject = ds._MSSQLServerConnection(ConnectionString, ReturnValue, query);
+                        retunobject = ds._MSSQLServerConnection(ConnectionString, query);
                         break;
                     case 2:
                         break;
@@ -45,7 +45,7 @@ namespace Authentication_Library_for_all_DB
 
                 throw new ApplicationException(ex.Message);
             }
-            
+
             return retunobject;
         }
 
@@ -53,28 +53,35 @@ namespace Authentication_Library_for_all_DB
         /// Get data from MS SQL Server
         /// </summary>
         /// <param name="ConnectionString">Connection String</param>
-        /// <param name="ReturnValue">1 for the entire row, 2 for only id. By default it will pass 2</param>
         /// <param name="query">Query to run</param>
         /// <returns>Return type object according to ReturnValue</returns>
-        private object _MSSQLServerConnection(string ConnectionString, int ReturnValue, string query)
-        { 
+        private object _MSSQLServerConnection(string ConnectionString, string query)
+        {
             Object data = new object();
-            if (ReturnValue == 1)
-            {
-                SqlConnection con = new SqlConnection(ConnectionString);
-                SqlCommand cmd = new SqlCommand(query,con);
-               
-                data = cmd.ExecuteScalar();
-                return data;
-            }
-            else if (ReturnValue == 2)
-            {
-                SqlConnection con = new SqlConnection(ConnectionString);
-                SqlCommand cmd = new SqlCommand(query, con);
 
+            SqlConnection con = new SqlConnection(ConnectionString);
+            SqlCommand cmd = new SqlCommand(query, con);
+            try
+            {
+                con.Open();
+                data = cmd.ExecuteScalar();
+                con.Close();
                 return data;
             }
-            return false;
+            catch (Exception ex)
+            {
+
+                throw new ApplicationException(ex.Message);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+
+
         }
     }
 }
