@@ -49,19 +49,32 @@ namespace Authentication_Library_for_all_DB
             return retunobject;
         }
 
+        /// <summary>
+        /// Get data from MS SQL Server
+        /// </summary>
+        /// <param name="ConnectionString">Connection String</param>
+        /// <param name="ReturnValue">1 for the entire row, 2 for only id. By default it will pass 2</param>
+        /// <param name="query">Query to run</param>
+        /// <returns>Return type object according to ReturnValue</returns>
         private object _MSSQLServerConnection(string ConnectionString, int ReturnValue, string query)
-        {
+        { 
+            Object data = new object();
             if (ReturnValue == 1)
             {
                 SqlConnection con = new SqlConnection(ConnectionString);
                 SqlCommand cmd = new SqlCommand(query,con);
+               
+                data = cmd.ExecuteScalar();
+                return data;
             }
             else if (ReturnValue == 2)
             {
                 SqlConnection con = new SqlConnection(ConnectionString);
                 SqlCommand cmd = new SqlCommand(query, con);
+
+                return data;
             }
-            return true;
+            return false;
         }
     }
 }
